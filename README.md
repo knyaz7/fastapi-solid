@@ -140,32 +140,6 @@ src/fastapi_solid/
 
 The API will be available at `http://localhost:8000` with interactive documentation at `http://localhost:8000/api/docs`.
 
-## 🔧 Key Components
-
-### Domain Layer
-- **Pure business logic** with no external dependencies
-- **Rich domain models** using dataclasses
-- **Value objects** and **entities** clearly defined
-
-### Application Layer
-- **Use cases** implemented as services
-- **Interfaces** for all external dependencies
-- **DTOs** for data transfer between layers
-- **Custom exception hierarchy** with HTTP status mapping
-
-### Infrastructure Layer
-- **Repository implementations** for data access
-- **Unit of Work** for transaction management
-- **Dependency injection** container configuration
-- **Redis cache implementation** with TTL support
-
-## 🎯 SOLID Principles Implementation
-
-- **Single Responsibility**: Each class has one reason to change
-- **Open/Closed**: Open for extension, closed for modification via interfaces
-- **Liskov Substitution**: All implementations substitutable for their interfaces
-- **Interface Segregation**: Small, focused interfaces
-- **Dependency Inversion**: High-level modules depend on abstractions, not concretions
 
 ## 🚦 API Endpoints
 
