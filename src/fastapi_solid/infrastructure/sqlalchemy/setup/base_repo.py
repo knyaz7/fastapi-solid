@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi_solid.application.exceptions.app_error import NotFound
 from fastapi_solid.application.interfaces.common.pagination import Pagination
-from fastapi_solid.domain.user.model import User
 from fastapi_solid.utils.logging.logger import get_logger
 
 from .base_model import Base
@@ -70,7 +69,7 @@ class AlchemyRepo[T: Base]:
         res = await self._session.execute(stmt)
         updated = res.scalar_one_or_none()
         if updated is None:
-            raise NotFound.domain_entity(User, id)
+            raise NotFound(f"{self.model.__name__[:-3]} with id={id} not found")
         logger.debug(f"Updated {updated}")
         return updated
 
@@ -78,6 +77,6 @@ class AlchemyRepo[T: Base]:
         entity = await self._session.get(self.model, id)
         entity_repr = repr(entity)
         if not entity:
-            raise NotFound.domain_entity(User, id)
+            raise NotFound(f"{self.model.__name__[:-3]} with id={id} not found")
         await self._session.delete(entity)
         logger.debug(f"Deleted {entity_repr}")

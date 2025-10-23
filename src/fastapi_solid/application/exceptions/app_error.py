@@ -22,3 +22,8 @@ class NotFound(AppError):
     def domain_entity(cls, ent_obj: type, id: UUID | str) -> NotFound:
         message = f"{ent_obj.__name__} with id '{id}' was not found"
         return cls(message)
+
+
+class ValidationError(AppError):
+    def __init__(self, message: str):
+        super().__init__(ErrorType.VALIDATION_ERROR, message)

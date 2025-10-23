@@ -1,209 +1,330 @@
 # FastAPI SOLID Template
 
-A production-ready FastAPI application template built with SOLID principles, Domain-Driven Design (DDD), and Clean Architecture patterns. Demonstrates best practices for scalable, maintainable Python web applications.
+This repository serves as a reference example of how to properly write applications, demonstrating best practices using modern technologies:
 
-## 🏗️ Architecture Overview
+- **FastAPI** - modern web framework with automatic documentation
+- **PostgreSQL** via **SQLAlchemy** - relational database with modern ORM
+- **MongoDB** via **Beanie** - document-oriented database
+- **Redis** - caching and session storage
+- **Alembic** - database migrations
 
-**Clean Architecture** with clear separation of concerns:
-- **Domain Layer**: Pure business logic and entities
-- **Application Layer**: Use cases, services, and interfaces  
-- **Infrastructure Layer**: External dependencies (database, web framework, caching)
+## 🚀 Quick Start
 
-## 🚀 Features
+```bash
+# Clone and install dependencies
+git clone <repository-url>
+cd fastapi-solid
+uv sync
 
-### Core Architecture
-- **SOLID Principles**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
-- **Domain-Driven Design (DDD)**: Rich domain models with clear boundaries
-- **Dependency Injection**: Using `dependency-injector` for loose coupling
-- **Unit of Work Pattern**: Transaction management with automatic rollback
-- **Repository Pattern**: Data access abstraction
-- **Error Handling**: Centralized exception handling with custom error types
-- **Pagination**: Built-in pagination support for API endpoints
+# Setup environment
+cp postgres.env.example postgres.env
+cp mongo.env.example mongo.env
 
-### Technology Stack
-- **FastAPI**: Modern, fast web framework with automatic OpenAPI documentation
-- **SQLAlchemy 2.0**: Async ORM with type hints and modern syntax
-- **PostgreSQL**: Production-ready relational database
-- **Redis**: Caching and session storage
-- **Alembic**: Database migrations
-- **Pydantic**: Data validation and serialization
-- **Rich**: Beautiful logging with colored output
+# Start services
+docker compose up --build -d
 
-### Advanced Features
-- **Async/Await**: Full async support throughout the application
-- **Caching**: Redis-based caching with `fastapi-cache2` and custom cache abstraction
-- **Logging**: Structured logging with Rich console output and filtering
-- **Database Migrations**: Automated schema management with Alembic
-- **Docker Support**: Production-ready containerization with health checks
-- **Type Safety**: Full type hints with mypy compatibility
-- **Code Quality**: Ruff for linting and formatting
-- **API Versioning**: Structured API versioning with `/api/v1` prefix
-- **Data Conversion**: JSON to dataclass converters for serialization
-
-## 📁 Project Structure
-
-```
-src/fastapi_solid/
-├── domain/                    # Domain layer (business logic)
-│   └── user/
-│       └── model.py          # Domain entities
-├── application/               # Application layer (use cases)
-│   ├── exceptions/           # Custom exception hierarchy
-│   │   ├── app_error.py      # Base application exceptions
-│   │   └── error_types.py    # Error type definitions
-│   ├── interfaces/           # Abstract interfaces
-│   │   ├── common/
-│   │   │   ├── key_value_cache.py # Cache interface
-│   │   │   ├── pagination.py      # Pagination interface
-│   │   │   └── uow.py             # Unit of Work interface
-│   │   └── users/
-│   │       └── repo.py       # Repository interface
-│   └── users/
-│       ├── dto.py            # Data Transfer Objects
-│       └── service.py        # Application services
-├── infrastructure/           # Infrastructure layer
-│   ├── di/
-│   │   └── container.py      # Dependency injection container
-│   ├── fastapi/
-│   │   ├── create_app.py     # FastAPI application factory
-│   │   ├── dependencies/
-│   │   │   └── pagination.py # Pagination dependencies
-│   │   ├── endpoints/
-│   │   │   ├── __init__.py   # API router configuration
-│   │   │   └── v1/
-│   │   │       └── users.py  # Versioned API endpoints
-│   │   └── error_handler.py  # Global error handling
-│   ├── migrator/             # Database migrations
-│   ├── redis/
-│   │   └── cache.py          # Redis cache implementation
-│   └── sqlalchemy/           # Database implementation
-│       ├── setup/
-│       │   ├── base_model.py # SQLAlchemy base model
-│       │   ├── base_repo.py  # Generic repository
-│       │   └── engine.py     # Database engine
-│       ├── uow.py            # Unit of Work implementation
-│       └── user/
-│           ├── repo.py       # User repository implementation
-│           └── table.py      # User ORM model
-└── utils/                    # Shared utilities
-    ├── config/
-    │   └── settings.py       # Configuration management
-    ├── converters/
-    │   ├── alch_to_dc.py     # ORM to dataclass converter
-    │   └── json_to_dc.py     # JSON to dataclass converter
-    └── logging/
-        ├── logger.py         # Logging setup
-        └── lib_log_filter.py # Library log filtering
+# Apply migrations
+docker exec -it fastapi-solid uv run alembic upgrade head
 ```
 
-## 🛠️ Setup and Installation
+API will be available at `http://localhost:8000` with documentation at `http://localhost:8000/api/docs`.
 
-### Prerequisites
-- Python 3.13+
-- Docker and Docker Compose
-- UV package manager (recommended)
+## 🏗️ Domain Layer
 
-### Quick Start
+The domain layer contains pure business logic and domain entities. Here we define the core models of the business domain and business rules.
 
-1. **Clone and install dependencies:**
-   ```bash
-   git clone <repository-url>
-   cd fastapi-solid
-   uv sync
-   ```
-
-2. **Set up environment:**
-   ```bash
-   cp db.env.example db.env
-   cp env.example .env
-   # Edit .env and db.env with your credentials
-   ```
-
-3. **Start services:**
-   ```bash
-   docker compose up --build -d
-   ```
-
-4. **Run migrations:**
-   ```bash
-   alembic upgrade head
-   ```
-
-5. **Start the application:**
-   ```bash
-   # Development
-   uv run fastapi-solid
-   
-   # Or using Docker (production-ready)
-   docker compose up --build -d
-   ```
-
-The API will be available at `http://localhost:8000` with interactive documentation at `http://localhost:8000/api/docs`.
-
-
-## 🚦 API Endpoints
-
-### Users (`/api/v1/users`)
-- `GET /api/v1/users` - Get all users with pagination support
-- `GET /api/v1/users/random` - Get a random user (demonstrates custom caching)
-- `GET /api/v1/users/{id}` - Get user by ID (cached for 10 seconds)
-- `POST /api/v1/users` - Create a new user
-- `DELETE /api/v1/users/{id}` - Delete a user
-
-### Pagination
-All list endpoints support pagination with query parameters:
-- `limit` (1-100, default: 10) - Number of items per page
-- `offset` (≥0, default: 0) - Number of items to skip
-
-### Error Handling
-- **Automatic validation** with Pydantic
-- **Type safety** with UUID and datetime handling
-- **Centralized error handling** with custom exception hierarchy
-- **HTTP status mapping** for different error types
-- **OpenAPI documentation** generation
-
-## 🔄 Transaction Management
-
-The application uses the **Unit of Work pattern** for transaction management:
+### Domain Entities
 
 ```python
-async with self.uow as unit_of_work:
-    user = await self.users_repo.create(user_in)
-    await unit_of_work.commit()  # Explicit commit
-    # Automatic rollback on exception
+@dataclass(frozen=True)
+class User:
+    id: UUID
+    name: str
+    created_at: datetime
+    updated_at: datetime
+
+@dataclass(frozen=True)
+class Player:
+    id: UUID
+    color: str
+    is_alive: bool
+    created_at: datetime
 ```
 
-## 🐳 Docker & Production Setup
+### Business Rules
 
-### Production-Ready Dockerfile
-- **Multi-stage build** with optimized layers
-- **Security best practices** with non-root user execution
-- **Minimal attack surface** with slim Python image
-- **UV package manager** for fast dependency installation
-- **Frozen dependencies** for reproducible builds
+```python
+def can_add_player(color: str) -> bool:
+    return color != "imposter"
+```
 
-### Docker Compose with Health Checks
-- **Service health monitoring** for all components
-- **Dependency management** with proper startup order
-- **Volume persistence** for database and Redis data
-- **Network isolation** between services
+## 📋 Application Layer
 
-### Configuration Management
-- **Environment-based settings** with Pydantic
-- **Configurable API port** via environment variables
-- **Optimized logging** with colored terminal output
-- **Development vs Production** configurations
+The application layer contains use cases, interfaces, and DTOs. Here we implement application logic without being tied to specific technologies.
 
-## 🧪 Development
+### Repository Pattern
 
-### Code Quality
-- **Ruff** for linting and formatting
-- **Type hints** throughout the codebase
-- **Consistent code style** with automatic formatting
+Repository interfaces are defined at the application level and abstract data access:
 
-### Database Migrations
+```python
+class UserRepository(ABC):
+    @abstractmethod
+    async def get_all(self, pagination: Pagination | None = None) -> list[User]: ...
+
+    @abstractmethod
+    async def get_by_id(self, id: UUID) -> User | None: ...
+
+    @abstractmethod
+    async def create(self, user_in: UserIn) -> User: ...
+
+    @abstractmethod
+    async def update(self, id: UUID, update_data: UserUpdate) -> User: ...
+
+    @abstractmethod
+    async def delete(self, id: UUID) -> None: ...
+```
+
+### Unit of Work Pattern
+
+Transaction management through context manager:
+
+```python
+class UnitOfWork(ABC):
+    @abstractmethod
+    async def __aenter__(self) -> UnitOfWork: ...
+
+    @abstractmethod
+    async def __aexit__(self, exc_type, exc, tb) -> None: ...
+
+    @abstractmethod
+    async def commit(self) -> None: ...
+
+    @abstractmethod
+    async def rollback(self) -> None: ...
+```
+
+### Use Cases (Application Services)
+
+At this level, we never depend on infrastructure - all repositories and other dependencies are abstractions:
+
+```python
+class UserService:
+    def __init__(self, uow: UnitOfWork, users_repo: UserRepository):
+        self.uow = uow
+        self.users_repo = users_repo
+
+    async def create(self, user_in: UserIn) -> UserOut:
+        async with self.uow as unit_of_work:
+            user = await self.users_repo.create(user_in)
+            await unit_of_work.commit()
+        return UserOut.model_validate(user, from_attributes=True)
+```
+
+### DTOs (Data Transfer Objects)
+
+```python
+class UserIn(BaseModel):
+    name: str
+
+class UserOut(UserIn):
+    id: UUID
+    created_at: datetime
+
+class UserUpdate(UserIn):
+    pass
+```
+
+### Exceptions
+
+```python
+class AppError(Exception):
+    def __init__(self, error_type: ErrorType, message: str):
+        self.error_type = error_type
+        self.message = message
+
+class NotFound(AppError):
+    def __init__(self, message: str):
+        super().__init__(ErrorType.NOT_FOUND, message)
+```
+
+## 🔧 Infrastructure Layer
+
+The infrastructure layer contains implementations of interfaces from the application layer and integrations with external systems.
+
+### Dependency Injection
+
+Configuration of dependencies using `dependency-injector`:
+
+```python
+class Container(containers.DeclarativeContainer):
+    wiring_config = containers.WiringConfiguration(
+        packages=["fastapi_solid.infrastructure.fastapi.endpoints.v1"]
+    )
+
+    redis = providers.Singleton(
+        Redis.from_url,
+        settings.redis_dsn,
+    )
+
+    key_value_cache = providers.Singleton(RedisCache, redis_client=redis)
+
+    al_session = providers.ContextLocalSingleton(async_session_factory)
+    be_session = providers.ContextLocalSingleton(client.start_session)
+
+    alchemy_uow = providers.Factory(AlchemyUnitOfWork, session=al_session)
+    beanie_uow = providers.Factory(
+        BeanieUnitOfWork if settings.mongo_use_transactions else DummyBeanieUnitOfWork,
+        session=be_session,
+    )
+
+    users_repo = providers.Factory(
+        AlchemyUserRepo, session=al_session, cache=key_value_cache
+    )
+    users_service = providers.Factory(
+        UserService, uow=alchemy_uow, users_repo=users_repo
+    )
+
+    player_repo = providers.Factory(BeaniePlayerRepo, session=be_session)
+    player_service = providers.Factory(
+        PlayerService, uow=beanie_uow, players_repo=player_repo
+    )
+```
+
+### FastAPI
+
+Creating endpoints with dependency injection. The `@cache` decorator provides HTTP response caching:
+
+```python
+from fastapi_cache.decorator import cache
+
+@users_router.get("", response_model=list[UserOut])
+@inject
+async def get_users(
+    users_service: Annotated[UserService, Depends(Provide[Container.users_service])],
+    pagination: Annotated[Pagination, Depends(get_pagination)],
+):
+    return await users_service.get_all(pagination)
+
+@users_router.get("/{id}", response_model=UserOut)
+@cache(10)  # HTTP response caching
+@inject
+async def get_user(
+    id: UUID,
+    users_service: Annotated[UserService, Depends(Provide[Container.users_service])],
+):
+    return await users_service.get_by_id(id)
+```
+
+### SQLAlchemy
+
+#### Base Repository
+
+Base repository provides common CRUD operations to avoid code duplication:
+
+```python
+class AlchemyRepo[T: Base]:
+    model: type[T]
+    
+    def __init__(self, session: AsyncSession):
+        self._session = session
+    
+    async def _get_all(self, pagination: Pagination | None = None) -> Sequence[T]: ...
+    async def _get_by_id(self, id: UUID) -> T | None: ...
+    async def _create(self, values: Mapping[str, Any]) -> T: ...
+    async def _update_by_id(self, id: UUID, values: Mapping[str, Any]) -> T: ...
+    async def _delete(self, id: UUID) -> None: ...
+```
+
+#### Repository Implementation
+
+```python
+class AlchemyUserRepo(UserRepository, AlchemyRepo[UserOrm]):
+    model = UserOrm
+
+    async def get_all(self, pagination: Pagination | None = None) -> list[User]:
+        users_orm = await self._get_all(pagination)
+        return [to_dataclass(u, User) for u in users_orm]
+
+    async def create(self, user_in: UserIn) -> User:
+        created_user = await self._create(user_in.model_dump())
+        return to_dataclass(created_user, User)
+```
+
+### Beanie (MongoDB)
+
+#### Base Repository
+
+Base repository provides common CRUD operations for MongoDB:
+
+```python
+class BeanieRepo[T: Document]:
+    model: type[T]
+    
+    def __init__(self, session: AsyncClientSession):
+        self._session = session
+    
+    async def _get_all(self, pagination: Pagination | None = None) -> Sequence[T]: ...
+    async def _get_by_id(self, id: UUID) -> T | None: ...
+    async def _create(self, values: dict[str, Any]) -> T: ...
+    async def _update_by_id(self, id: UUID, values: dict[str, Any]) -> T: ...
+    async def _delete(self, id: UUID) -> None: ...
+```
+
+#### Repository Implementation
+
+```python
+class BeaniePlayerRepo(PlayerRepository, BeanieRepo[PlayerOdm]):
+    model = PlayerOdm
+
+    async def get_all(self, pagination: Pagination | None = None) -> list[Player]:
+        docs = await self._get_all(pagination)
+        return [to_dataclass(d, Player) for d in docs]
+
+    async def create(self, player_in: PlayerIn) -> Player:
+        doc = await self._create(player_in.model_dump())
+        return to_dataclass(doc, Player)
+```
+
+### Redis
+
+Caching implementation:
+
+```python
+class RedisCache(KeyValueCache):
+    def __init__(self, redis_client: Redis):
+        self._redis_client = redis_client
+
+    async def get(self, key: str) -> CacheResponse:
+        return await self._redis_client.get(key)
+
+    async def set(self, key: str, value: str | bytes, ttl: int) -> None:
+        await self._redis_client.set(key, value, ex=ttl)
+```
+
+### Unit of Work for SQLAlchemy
+
+```python
+class AlchemyUnitOfWork(UnitOfWork):
+    def __init__(self, session: AsyncSession):
+        self._session = session
+
+    async def __aenter__(self) -> "UnitOfWork":
+        await self._session.__aenter__()
+        return self
+
+    async def commit(self) -> None:
+        await self._session.commit()
+
+    async def rollback(self) -> None:
+        await self._session.rollback()
+```
+
+### Alembic
+
+Database migration management:
+
 ```bash
-# Create a new migration
+# Create new migration
 alembic revision --autogenerate -m "description"
 
 # Apply migrations
@@ -213,38 +334,126 @@ alembic upgrade head
 alembic downgrade -1
 ```
 
-### Testing
-The template is ready for testing with:
-- **Pytest** for unit and integration tests
-- **Test containers** for database testing
-- **Mocking** with dependency injection
-- **Async test support**
+### Beanie Migrations
 
-## 📚 Learning Resources
+MongoDB migration management using custom commands:
 
-This template demonstrates:
-- **Clean Architecture** principles
-- **Domain-Driven Design** patterns
-- **SOLID principles** in practice
-- **Modern Python** async/await patterns
-- **FastAPI** best practices with API versioning
-- **SQLAlchemy 2.0** modern syntax
-- **Dependency injection** patterns
-- **Transaction management** strategies
-- **Error handling** with custom exception hierarchy
-- **Caching strategies** with Redis and custom abstractions
-- **Pagination** implementation for scalable APIs
-- **Data serialization** with Pydantic and custom converters
-- **Production deployment** with Docker and health checks
-- **Container security** best practices
+```bash
+# Create new migration
+uv run mongo-migrate-create <migration_name>
 
-## 🤝 Contributing
+# Apply all forward migrations
+uv run mongo-migrate-af
 
-1. Follow the existing code style and patterns
-2. Add tests for new features
-3. Update documentation as needed
-4. Ensure all checks pass before submitting
+# Apply one forward migration
+uv run mongo-migrate-of
 
-## 📄 License
+# Rollback one migration
+uv run mongo-migrate-ob
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+# Rollback all migrations
+uv run mongo-migrate-ab
+```
+
+Example migration file:
+
+```python
+from beanie import Document, iterative_migration
+
+class OldPlayerOdm(Document):
+    id: UUID = Field(default_factory=uuid4)
+    clor: str  # typo in field name
+    is_alive: bool
+    created_at: datetime
+
+class NewPlayerOdm(Document):
+    id: UUID = Field(default_factory=uuid4)
+    color: str  # fixed field name
+    is_alive: bool
+    created_at: datetime
+
+class Forward:
+    @iterative_migration()
+    async def clor_to_color(
+        self, input_document: OldPlayerOdm, output_document: NewPlayerOdm
+    ):
+        output_document.color = input_document.clor
+
+class Backward:
+    @iterative_migration()
+    async def clor_to_color(
+        self, input_document: NewPlayerOdm, output_document: OldPlayerOdm
+    ):
+        output_document.clor = input_document.color
+```
+
+## 📁 Project Structure
+
+```
+src/fastapi_solid/
+├── domain/                    # Domain layer
+│   ├── user/
+│   │   └── model.py          # User domain entity
+│   └── player/
+│       ├── model.py          # Player domain entity
+│       └── rules.py          # Business rules
+├── application/               # Application layer
+│   ├── exceptions/           # Application exceptions
+│   ├── interfaces/           # Interfaces
+│   │   ├── common/           # Common interfaces
+│   │   │   ├── key_value_cache.py
+│   │   │   ├── pagination.py
+│   │   │   └── uow.py
+│   │   ├── users/
+│   │   │   └── repo.py       # User repository interface
+│   │   └── players/
+│   │       └── repo.py       # Player repository interface
+│   ├── users/
+│   │   ├── dto.py            # User DTOs
+│   │   └── service.py        # User service
+│   └── players/
+│       ├── dto.py            # Player DTOs
+│       └── service.py        # Player service
+├── infrastructure/           # Infrastructure layer
+│   ├── di/
+│   │   └── container.py      # Dependency injection container
+│   ├── fastapi/
+│   │   ├── create_app.py     # Application factory
+│   │   ├── dependencies/
+│   │   │   └── pagination.py # Pagination dependencies
+│   │   ├── endpoints/
+│   │   │   └── v1/
+│   │   │       ├── users.py   # User endpoints
+│   │   │       └── players.py # Player endpoints
+│   │   └── error_handler.py  # Error handler
+│   ├── alembic/             # Database migrations
+│   ├── redis/
+│   │   └── cache.py          # Redis cache implementation
+│   ├── sqlalchemy/           # SQLAlchemy implementation
+│   │   ├── setup/
+│   │   │   ├── base_model.py # Base model
+│   │   │   ├── base_repo.py  # Base repository
+│   │   │   └── engine.py     # Database engine
+│   │   ├── uow.py            # Unit of Work for SQLAlchemy
+│   │   └── user/
+│   │       ├── repo.py       # User repository
+│   │       └── table.py      # User ORM model
+│   └── beanie/               # Beanie implementation
+│       ├── setup/
+│       │   ├── base_repo.py  # Base repository
+│       │   └── client.py     # MongoDB client
+│       ├── uow.py            # Unit of Work for Beanie
+│       └── player/
+│           ├── repo.py       # Player repository
+│           └── model.py      # Player ODM model
+└── utils/                    # Utilities
+    ├── config/
+    │   └── settings.py       # Application settings
+    ├── converters/           # Data converters
+    │   ├── alch_to_dc.py     # SQLAlchemy -> dataclass
+    │   ├── beanie_to_dc.py   # Beanie -> dataclass
+    │   └── json_to_dc.py    # JSON -> dataclass
+    └── logging/
+        ├── logger.py         # Logging setup
+        └── lib_log_filter.py # Library log filter
+```

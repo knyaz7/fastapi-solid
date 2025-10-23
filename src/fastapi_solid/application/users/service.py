@@ -1,7 +1,5 @@
 from uuid import UUID
 
-from pydantic import TypeAdapter
-
 from fastapi_solid.application.exceptions.app_error import NotFound
 from fastapi_solid.application.interfaces.common.pagination import Pagination
 from fastapi_solid.application.interfaces.common.uow import UnitOfWork
@@ -17,7 +15,6 @@ class UserService:
     def __init__(self, uow: UnitOfWork, users_repo: UserRepository):
         self.uow = uow
         self.users_repo = users_repo
-        self._users_list_adapter = TypeAdapter(list[UserOut])
 
     async def get_all(self, pagination: Pagination) -> list[UserOut]:
         async with self.uow:
