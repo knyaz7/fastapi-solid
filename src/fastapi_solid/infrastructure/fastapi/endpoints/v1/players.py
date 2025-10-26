@@ -48,9 +48,7 @@ async def create_player(
     return await player_service.create(player_in)
 
 
-@players_router.put(
-    "/{id}", response_model=PlayerOut, status_code=status.HTTP_201_CREATED
-)
+@players_router.put("/{id}", response_model=PlayerOut)
 @inject
 async def update_player(
     id: UUID,

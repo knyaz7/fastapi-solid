@@ -1,6 +1,6 @@
 [project]
 name = "fastapi-solid"
-version = "1.1.0"
+version = "1.1.1"
 description = "Clean FastAPI template: SOLID design, SQLAlchemy UoW, Redis cache, Alembic."
 readme = "README.md"
 authors = [

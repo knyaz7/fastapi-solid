@@ -51,7 +51,7 @@ async def create_user(
     return await users_service.create(user_in)
 
 
-@users_router.put("/{id}", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+@users_router.put("/{id}", response_model=UserOut)
 @inject
 async def update_user(
     id: UUID,

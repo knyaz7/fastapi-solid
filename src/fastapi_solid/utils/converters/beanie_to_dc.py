@@ -4,7 +4,7 @@ from beanie import Document
 
 
 def to_dataclass[T](obj: Document, cls: type[T]) -> T:
-    """Собирает dataclass из ORM-модели"""
+    """Build a dataclass instance from an ODM document"""
     if not is_dataclass(cls):
         raise TypeError(f"{cls} is not a dataclass")
 

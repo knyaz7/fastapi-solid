@@ -57,7 +57,7 @@ class AlchemyRepo[T: Base]:
             len(created_entities),
             self.model.__class__.__name__,
         )
-        return res.scalars().all()
+        return created_entities
 
     async def _update_by_id(self, id: UUID, values: Mapping[str, Any]) -> T:
         stmt = (

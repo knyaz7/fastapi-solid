@@ -24,7 +24,7 @@ def setup_logging():
     rich_handler.setFormatter(logging.Formatter("[ %(funcName)s() ] - %(message)s"))
 
     root_logger = logging.getLogger()
-    root_logger.setLevel("DEBUG")
+    root_logger.setLevel(settings.logging_level)
     root_logger.addHandler(rich_handler)
 
 

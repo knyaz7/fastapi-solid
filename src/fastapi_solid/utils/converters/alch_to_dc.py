@@ -4,7 +4,7 @@ from fastapi_solid.infrastructure.sqlalchemy.setup.base_model import Base
 
 
 def to_dataclass[T](obj: Base, cls: type[T]) -> T:
-    """Собирает dataclass из ORM-модели"""
+    """Builds dataclass from ORM-model"""
     if not is_dataclass(cls):
         raise TypeError(f"{cls} is not a dataclass")
 
